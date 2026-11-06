@@ -42,3 +42,21 @@ Si 5000, 5433 u 8888 están ocupados, cambiarlos en `.env` (`WEB_PORT`, `PG_PORT
 No contiene el prompt listo, la consulta Overpass QL terminada, las funciones de consumo de APIs, el orquestador de peticiones, el formulario, la escritura SQL, las consultas de analítica ni el dashboard terminado. Eso es exactamente lo que se evalúa. La **memoria individual de IA** aporta 2/10 puntos, y la ocultación o falsedad contrastada puede reducir adicionalmente hasta un 30 % la nota de esta actividad.
 
 **Fuentes y atribución:** Open-Meteo (https://open-meteo.com), OpenStreetMap/Overpass (https://www.openstreetmap.org/copyright), Cohere (https://docs.cohere.com). Open-Meteo es libre para uso no comercial; respetad atribución y los límites de los servicios públicos.
+
+## Cómo arrancar
+
+1. Copiar `.env.example` a `.env` (no se sube a Git).
+2. Ejecutar `docker compose up --build -d`.
+3. Abrir:
+   - Web: http://localhost:5000
+   - Panel: http://localhost:5000/analitica
+   - Jupyter: http://localhost:8888
+
+## Equipo y colaboración
+
+| Persona | Parte | PR 1 | PR 2 | Revisó |
+|---|---|---|---|---|
+| Pablo Díaz | Geocoding, clima, notebook, README | enlace | enlace | Pablo Prost |
+| Pablo Prost | Lugares (Overpass), Cohere | enlace | enlace | Alfredo Clemente |
+| Sergio Gilabert | Base de datos, panel | enlace | enlace | Pablo Díaz |
+| Alfredo Clemente | Orquestador, formulario y API | enlace | enlace | Sergio Gilabert |
