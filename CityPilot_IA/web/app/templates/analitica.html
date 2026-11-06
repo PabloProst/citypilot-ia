@@ -1,17 +1,74 @@
 {% extends "base.html" %}
 {% block title %}Analítica · CityPilot IA{% endblock %}
 {% block content %}
-<section class="hero"><span class="eyebrow">MONITORIZACIÓN · POSTGRESQL</span><h1>Qué están pidiendo los usuarios</h1><p>Un panel basado en las solicitudes realmente almacenadas.</p></section>
-<section class="three">
-  <article class="tile"><h3>Peticiones totales</h3><p class="metric">—</p></article>
-  <article class="tile"><h3>Ciudades distintas</h3><p class="metric">—</p></article>
-  <article class="tile"><h3>Errores</h3><p class="metric">—</p></article>
+<section class="hero">
+  <span class="eyebrow">MONITORIZACIÓN · POSTGRESQL</span>
+  <h1>Qué están pidiendo los usuarios</h1>
+  <p>Un panel basado en las solicitudes realmente almacenadas.</p>
 </section>
+
+<section class="three">
+  <article class="tile">
+    <h3>Peticiones totales</h3>
+    <p class="metric">{{ totales.total }}</p>
+  </article>
+  <article class="tile">
+    <h3>Ciudades distintas</h3>
+    <p class="metric">{{ totales.por_ciudad_y_tipo | map(attribute='ciudad') | unique | list | length }}</p>
+  </article>
+  <article class="tile">
+    <h3>Errores</h3>
+    <p class="metric">{{ totales.errores }}</p>
+  </article>
+</section>
+
 <section class="surface">
   <h2>Distribución de peticiones</h2>
-  <!-- TODO(ALUMNADO): imagen de /analitica/grafico.png y tabla (o top 5)
-       desde los datos consultados a PostgreSQL, NO en memoria.
-       Mostrar además una tabla de las 8 últimas peticiones (sin secretos). -->
-  <div class="todo">🛠️ Por implementar: métricas, una gráfica y tabla de peticiones recientes.</div>
+
+  <img src="/analitica/grafico.png" alt="Gráfico de peticiones por ciudad y tipo de turismo" style="max-width:100%;">
+
+  <h3>Top 5 ciudad / tipo de turismo</h3>
+  {% if top_ciudades %}
+  <table>
+    <thead>
+      <tr><th>Ciudad</th><th>Tipo de turismo</th><th>Peticiones</th></tr>
+    </thead>
+    <tbody>
+      {% for g in top_ciudades %}
+      <tr>
+        <td>{{ g.ciudad }}</td>
+        <td>{{ g.tipo_turismo }}</td>
+        <td>{{ g.cantidad }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Todavía no hay peticiones guardadas.</p>
+  {% endif %}
+
+  <h3>Últimas 8 peticiones</h3>
+  {% if ultimas %}
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Fecha</th><th>Ciudad</th><th>Tipo</th><th>Estado</th><th>Demo</th><th>Duración (ms)</th></tr>
+    </thead>
+    <tbody>
+      {% for s in ultimas %}
+      <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+        <td>{{ s.ciudad }}</td>
+        <td>{{ s.tipo_turismo }}</td>
+        <td>{{ s.estado }}</td>
+        <td>{{ 'Sí' if s.modo_demo else 'No' }}</td>
+        <td>{{ s.duracion_ms if s.duracion_ms is not none else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Todavía no hay peticiones recientes.</p>
+  {% endif %}
 </section>
 {% endblock %}
