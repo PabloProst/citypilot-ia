@@ -10,25 +10,57 @@ OVERPASS_URL = os.getenv("OVERPASS_URL", "https://overpass-api.de/api/interprete
 
 
 def geocodificar(ciudad: str) -> dict:
-    """TODO(ALUMNADO).
+    params = {
+        "name": ciudad,
+        "count": 1,
+        "language": "es",
+        "countryCode": "ES",
+    }
+    r = requests.get(GEO_URL, params=params, timeout=8)
+    r.raise_for_status()
 
-    Entrada: 'Valencia'. Salida normalizada: {'ciudad': 'Valencia',
-    'pais': 'España', 'lat': 39.47, 'lon': -0.38} (números ilustrativos).
-    Usar Open-Meteo Geocoding y controlar búsqueda sin resultados.
-    Restricción: peticiones con timeout, filtrando countryCode='ES' si se
-    decide limitar a España.
-    """
-    raise NotImplementedError("Implementa búsqueda de coordenadas")
+    resultados = r.json().get("results")
+    if not resultados:
+        raise ValueError(f"No se encontró la ciudad '{ciudad}'")
+
+    primero = resultados[0]
+    lat, lon = primero.get("latitude"), primero.get("longitude")
+    if lat is None or lon is None:
+        raise ValueError(f"Sin coordenadas para '{ciudad}'")
+
+    return {
+        "ciudad": primero.get("name", ciudad),
+        "pais": primero.get("country", "España"),
+        "lat": float(lat),
+        "lon": float(lon),
+    }
 
 
 def obtener_meteorologia(lat: float, lon: float) -> dict:
-    """TODO(ALUMNADO).
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "current": "temperature_2m,precipitation,weather_code",
+        "timezone": "auto",
+    }
+    r = requests.get(METEO_URL, params=params, timeout=8)
+    r.raise_for_status()
 
-    Devolver, como mínimo: temperatura_c, precipitacion_mm,
-    codigo_tiempo, instante. Seleccionar current=temperature_2m,
-    precipitation,weather_code e incluir timezone=auto.
-    """
-    raise NotImplementedError("Implementa consulta meteorológica")
+    actual = r.json().get("current")
+    if not actual:
+        raise RuntimeError("Open-Meteo no devolvió condiciones actuales")
+
+    campos = ("temperature_2m", "precipitation", "weather_code", "time")
+    faltan = [c for c in campos if actual.get(c) is None]
+    if faltan:
+        raise RuntimeError(f"Faltan campos meteorológicos: {faltan}")
+
+    return {
+        "temperatura_c": float(actual["temperature_2m"]),
+        "precipitacion_mm": float(actual["precipitation"]),
+        "codigo_tiempo": int(actual["weather_code"]),
+        "instante": str(actual["time"]),
+    }
 
 
 def obtener_lugares(lat: float, lon: float, tipo: str) -> list[dict]:
