@@ -1,9 +1,0 @@
-.env
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.ipynb_checkpoints/
-.venv/
-.coverage
-*.log
-.DS_Store
