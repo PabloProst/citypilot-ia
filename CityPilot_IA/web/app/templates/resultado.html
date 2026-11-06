@@ -3,11 +3,49 @@
 {% block content %}
 <section class="hero"><span class="eyebrow">TU ITINERARIO</span><h1>Un día diferente</h1></section>
 <section class="surface">
-  <!-- TODO(ALUMNADO): mostrar ciudad, tipo, temperatura, lluvia,
-       3-5 paradas, enlaces individuales a OSM si hay coordenadas,
-       tiempo estimado y texto generado por el modelo.
-       Si modo_demo: mostrar un aviso muy visible de DATOS SIMULADOS.
-       Si hay error: mostrar mensaje comprensible sin secretos. -->
+  
+<section class="surface">
+  {% if error %}
+    <div class="notice">⚠️ <strong>No se pudo generar la ruta:</strong> {{ error }}</div>
+    <a class="button" href="/">Volver a intentarlo</a>
+  {% else %}
+    {% if modo_demo %}
+      <div class="notice">⚠️ <strong>DATOS DEMO:</strong> no se pudieron obtener lugares reales de OpenStreetMap. Los lugares mostrados son ficticios.</div>
+    {% endif %}
+    {% if modo_modelo == "mock" %}
+      <div class="notice">🤖 <strong>MODELO SIMULADO:</strong> el itinerario no lo ha generado una IA.</div>
+    {% endif %}
+
+    <h2>{{ ciudad }} · {{ tipo_turismo }}</h2>
+    <p>
+      🌡️ {{ meteorologia.temperatura_c }} °C ·
+      🌧️ {{ meteorologia.precipitacion_mm }} mm ·
+      ⏱️ {{ duracion_horas }} horas
+    </p>
+
+    <h3>Paradas</h3>
+    {% if lugares %}
+      <ol>
+        {% for lugar in lugares[:5] %}
+          <li>
+            {{ lugar.nombre }} ({{ lugar.categoria }})
+            {% if lugar.lat and lugar.lon %}
+              · <a href="https://www.openstreetmap.org/?mlat={{ lugar.lat }}&mlon={{ lugar.lon }}#map=18/{{ lugar.lat }}/{{ lugar.lon }}" target="_blank" rel="noopener">Ver en mapa</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p>No hay lugares reales disponibles para esta búsqueda.</p>
+    {% endif %}
+
+    <h3>Itinerario</h3>
+    <div class="itinerario">{{ itinerario }}</div>
+
+    <p><a class="button" href="/">Planificar otra ruta</a></p>
+  {% endif %}
+</section>
+
   <div class="todo">🛠️ Por implementar: resultado del planificador.</div>
 </section>
 {% endblock %}
